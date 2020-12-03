@@ -1,7 +1,7 @@
 {
-  "name": "@eyevinn/srt",
-  "version": "0.5.2",
-  "description": "Nodejs bindings for Secure Reliable Transport SDK",
+  "name": "am_srt",
+  "version": "0.5.3",
+  "description": "Nodejs bindings for Secure Reliable Transport SDK - Forked from https://github.com/Eyevinn/node-srt.git",
   "main": "index.js",
   "scripts": {
     "install": "npm run build-srt && npm run rebuild",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Eyevinn/node-srt.git"
+    "url": "git+https://github.com/amunhoz/node-srt.git"
   },
   "gypfile": true,
   "author": "Eyevinn Technology AB <work@eyevinn.se>",
@@ -48,9 +48,9 @@
     "node-gyp": "^7.0.0"
   },
   "bugs": {
-    "url": "https://github.com/Eyevinn/node-srt/issues"
+    "url": "https://github.com/amunhoz/node-srt.git"
   },
-  "homepage": "https://github.com/Eyevinn/node-srt#readme",
+  "homepage": "https://github.com/amunhoz/node-srt.git#readme",
   "directories": {
     "example": "examples"
   },
