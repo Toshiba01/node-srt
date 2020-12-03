@@ -4,3 +4,4 @@ tsc-lib
 deps
 output
 .vscode
+/.project

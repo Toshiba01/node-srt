@@ -31,6 +31,7 @@ Napi::Object NodeSRT::Init(Napi::Env env, Napi::Object exports) {
     InstanceMethod("getSockState", &NodeSRT::GetSockState),
     InstanceMethod("epollCreate", &NodeSRT::EpollCreate),
     InstanceMethod("epollAddUsock", &NodeSRT::EpollAddUsock),
+    InstanceMethod("epollRemoveUsock", &NodeSRT::EpollRemoveUsock),
     InstanceMethod("epollUWait", &NodeSRT::EpollUWait),
     InstanceMethod("setLogLevel", &NodeSRT::SetLogLevel),
 
@@ -202,11 +203,14 @@ Napi::Value NodeSRT::Read(const Napi::CallbackInfo& info) {
   Napi::Number chunkSize = info[1].As<Napi::Number>();
 
   // Q: why not converting to `int` directly here?
-  size_t bufferSize = uint32_t(chunkSize);
-  uint8_t *buffer = (uint8_t *)malloc(bufferSize);
-  memset(buffer, 0, bufferSize);
+  //size_t bufferSize = uint32_t(chunkSize);
+  //uint8_t *buffer = (uint8_t *)malloc(bufferSize);
+  //memset(buffer, 0, bufferSize);
+  //char * buffer = new char[bufferSize];
+  SRT_MSGCTRL mc = srt_msgctrl_default;
+  mc.inorder = true;
 
-  int nb = srt_recvmsg(socketValue, (char *)buffer, (int)bufferSize);
+  int nb = srt_recvmsg2(socketValue, bufferRead, (int)chunkSize, &mc);
   if (nb == SRT_ERROR) {
     string err(string("srt_recvmsg: ")
       + string(srt_getlasterror_str()));
@@ -215,8 +219,9 @@ Napi::Value NodeSRT::Read(const Napi::CallbackInfo& info) {
   }
 
   // Q: why not using char as data/template type?
-  Napi::Value nbuff = Napi::Buffer<uint8_t>::Copy(env, buffer, nb);
-  free(buffer);
+  Napi::Value nbuff = Napi::Buffer<char>::Copy(env, bufferRead, nb);
+  //free(buffer);
+  //delete [] buffer;
 
   return nbuff;
 }
@@ -230,7 +235,10 @@ Napi::Value NodeSRT::Write(const Napi::CallbackInfo& info) {
   // Q: why not using char as data/template type?
   Napi::Buffer<uint8_t> chunk = info[1].As<Napi::Buffer<uint8_t>>();
 
-  int result = srt_sendmsg2(socketValue, (const char *)chunk.Data(), chunk.Length(), nullptr);
+  SRT_MSGCTRL mc = srt_msgctrl_default;
+  mc.inorder = true;
+
+  int result = srt_sendmsg2(socketValue, (const char *)chunk.Data(), chunk.Length(),  &mc);
   if (result == SRT_ERROR) {
     string err(string("srt_sendmsg2: ")
       + string(srt_getlasterror_str()));
@@ -392,6 +400,22 @@ Napi::Value NodeSRT::EpollAddUsock(const Napi::CallbackInfo& info) {
 
   int events = eventsValue;
   int result = srt_epoll_add_usock(epidValue, socketValue, &events);
+  if (result == SRT_ERROR) {
+    Napi::Error::New(env, srt_getlasterror_str()).ThrowAsJavaScriptException();
+    return Napi::Number::New(env, SRT_ERROR);
+  }
+  return Napi::Number::New(env, result);
+}
+
+Napi::Value NodeSRT::EpollRemoveUsock(const Napi::CallbackInfo& info){
+  Napi::Env env = info.Env();
+  Napi::HandleScope scope(env);
+
+  Napi::Number epidValue = info[0].As<Napi::Number>();
+  Napi::Number socketValue = info[1].As<Napi::Number>();
+
+  int events = eventsValue;
+  int result = srt_epoll_remove_usock(epidValue, socketValue);
   if (result == SRT_ERROR) {
     Napi::Error::New(env, srt_getlasterror_str()).ThrowAsJavaScriptException();
     return Napi::Number::New(env, SRT_ERROR);

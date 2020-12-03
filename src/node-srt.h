@@ -7,6 +7,8 @@ class NodeSRT : public Napi::ObjectWrap<NodeSRT> {
     ~NodeSRT();
 
   private:
+    char * bufferRead = new char[64 * 1024]; //initiate once
+
     static Napi::FunctionReference constructor;
     Napi::Value CreateSocket(const Napi::CallbackInfo& info);
     Napi::Value Bind(const Napi::CallbackInfo& info);
@@ -22,6 +24,7 @@ class NodeSRT : public Napi::ObjectWrap<NodeSRT> {
 
     Napi::Value EpollCreate(const Napi::CallbackInfo& info);
     Napi::Value EpollAddUsock(const Napi::CallbackInfo& info);
+    Napi::Value EpollRemoveUsock(const Napi::CallbackInfo& info);
     Napi::Value EpollUWait(const Napi::CallbackInfo& info);
 
     Napi::Value SetLogLevel(const Napi::CallbackInfo& info);
