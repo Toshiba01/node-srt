@@ -1,6 +1,6 @@
 {
   "name": "am_srt",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Nodejs bindings for Secure Reliable Transport SDK - Forked from https://github.com/Eyevinn/node-srt.git",
   "main": "index.js",
   "scripts": {

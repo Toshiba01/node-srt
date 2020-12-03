@@ -413,8 +413,6 @@ Napi::Value NodeSRT::EpollRemoveUsock(const Napi::CallbackInfo& info){
 
   Napi::Number epidValue = info[0].As<Napi::Number>();
   Napi::Number socketValue = info[1].As<Napi::Number>();
-
-  int events = eventsValue;
   int result = srt_epoll_remove_usock(epidValue, socketValue);
   if (result == SRT_ERROR) {
     Napi::Error::New(env, srt_getlasterror_str()).ThrowAsJavaScriptException();
