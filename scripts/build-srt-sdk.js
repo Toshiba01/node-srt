@@ -52,6 +52,8 @@ function build() {
   default:
     buildNx();
   }
+  console.log("Removing source code")
+  spawnSync('rm', ['-R', "-f", srtSourcePath], { cwd: srtSourcePath, shell: true, stdio: 'inherit' });
 }
 
 function buildWin32() {
